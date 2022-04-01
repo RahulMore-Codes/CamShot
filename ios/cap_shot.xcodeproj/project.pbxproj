@@ -145,7 +145,6 @@
 				55CBD187B836357B1ACB3F0E /* Pods-cap_shot-cap_shotTests.debug.xcconfig */,
 				11E2FB86AFC6EBA28694BE57 /* Pods-cap_shot-cap_shotTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -485,6 +484,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 64K7N3X9FS;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = cap_shot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -511,6 +511,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 64K7N3X9FS;
 				INFOPLIST_FILE = cap_shot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

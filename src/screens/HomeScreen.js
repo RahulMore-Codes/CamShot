@@ -1,18 +1,28 @@
-import {useEffect, useState} from 'react';
+import 'react-native-reanimated';
+import {useEffect, useState, useRef} from 'react';
 import {
   StyleSheet,
   View,
-  SafeAreaView,
-  TouchableOpacity,
   Text,
-  ActivityIndicator,
+  TouchableOpacity,
+  SafeAreaView,
+  Dimensions,
 } from 'react-native';
-import {Camera, useCameraDevices} from 'react-native-vision-camera';
+import {
+  Camera,
+  useCameraDevices,
+  useFrameProcessor,
+} from 'react-native-vision-camera';
 import Colors from '../constants/Colors';
 
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
+
 const HomeScreen = () => {
+  const cameraRef = useRef();
   const [hasPermission, setHasPermission] = useState(false);
-  const devices = useCameraDevices();
+  const [sensitivity, setSensitivity] = useState(0.4);
+  const devices = useCameraDevices('wide-angle-camera');
   const device = devices.back;
 
   useEffect(() => {
@@ -26,13 +36,26 @@ const HomeScreen = () => {
     const photo = await cameraRef.current.takePhoto({
       flash: 'on',
     });
-
     console.log(photo);
   };
+
+  const focusOnPoint = async (pointX, pointY) => {
+    console.log(pointX);
+    await cameraRef.current.focus({x: pointX, y: pointY});
+  };
+
+  const frameProcessor = useFrameProcessor(frame => {
+    'worklet';
+
+    console.log(frame);
+  }, []);
 
   const renderCameraOverlay = () => {
     return (
       <View
+        onTouchEnd={({nativeEvent}) =>
+          focusOnPoint(nativeEvent.pageX, nativeEvent.pageY)
+        }
         style={{
           position: 'absolute',
           height: '100%',
@@ -52,55 +75,33 @@ const HomeScreen = () => {
             marginBottom: 15,
             padding: 2,
           }}>
-          <View
-            style={{flex: 1, backgroundColor: '#fff', borderRadius: 40}}></View>
+          <View style={{flex: 1, backgroundColor: '#fff', borderRadius: 40}} />
         </TouchableOpacity>
-        <View
-          style={{
-            height: 60,
-            width: '100%',
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            justifyContent: 'center',
-          }}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-evenly',
-            }}>
-            <Text>QR</Text>
-            <Text>AR</Text>
-          </View>
-        </View>
+        <View />
       </View>
     );
   };
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#fff',
-      }}>
-      {device == null ? (
-        <ActivityIndicator color="#000" />
-      ) : (
-        <View style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1}}>
+      {device != null && hasPermission ? (
+        <>
           <Camera
             ref={cameraRef}
-            photo={true}
-            orientation="portrait"
-            lowLightBoost
-            enableZoomGesture
-            style={{...StyleSheet.absoluteFill}}
-            device={device}
+            style={StyleSheet.absoluteFill}
             isActive={true}
+            device={device}
+            photo={true}
+            enableZoomGesture
+            frameProcessor={frameProcessor}
+            onTouchEnd={({nativeEvent}) =>
+              focusOnPoint(nativeEvent.pageX, nativeEvent.pageY)
+            }
           />
           {renderCameraOverlay()}
-        </View>
+        </>
+      ) : (
+        <Text>No camera</Text>
       )}
     </SafeAreaView>
   );
